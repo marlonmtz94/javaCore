@@ -1,11 +1,14 @@
 package com.marlon.assignments;
 
-import java.util.ArrayList; 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List; 
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -50,7 +53,7 @@ class Employee{
 	int age;
 	String gender;
 	String dep;
-	int yearOfJoinging;
+	int yearOfJoining;
 	double salary; 
 	
 	
@@ -73,7 +76,7 @@ public class assignment5 {
 		list.add(new Employee(5,"Myra",28,"Female","Developer",2020, 78000)); 
 		list.add(new Employee(6,"Josh",30,"Male","Security",2021, 75000)); 
 		list.add(new Employee(7,"Jannet",26,"Female","IT",2022, 60000)); 
-		list.add(new Employee(8,"Leslie",26,"Female","HR",2021, 65000)); 
+		list.add(new Employee(8,"Leslie",26,"Female","Maintenance",2021, 65000)); 
 		
 		//part 1 
 		// employees counting them all 
@@ -93,9 +96,53 @@ public class assignment5 {
 		
 		//part 4 
 		// this will list all the employees who joined after 2015
+		List<String> joined = list.stream().filter(e -> e.getYearOfJoining() > 2015).map(e->e.getName()).collect(Collectors.toList());
+		System.out.println("Employees who joined after 2015 are: "+ joined);
 		
+		//part 5 
+		// this will find the most senior in the employees, this will work if all the Years are UNIQUE ONLY 
+		Employee senior = list.stream().min(Comparator.comparing(e -> e.getYearOfJoining())).get();
+		System.out.println("The Senior is: " + senior.getName());	
+		//I was trying to get multiple seniors if there were multiple people with the same year of joined but cant seem to get it to work  
+		/*
+		Map<String,Integer> mine = list.stream()
+				.collect(Collectors.groupingBy(e->e.getName(), Collectors.minBy(e->e.getYearOfJoining()))); 
 		
-
+		list.stream().filter(e->e.getYearOfJoining() < 2015).map(e->e.getName()).collect(Collectors.toList()); 
+		*/
+	
+		//part 6
+		// will count the number of employees for each department
+		Map<String, Long> departmentCount = list.stream()
+				.collect(Collectors.groupingBy(Employee::getDep, TreeMap::new, Collectors.counting()));
+		departmentCount.forEach((dep, count) -> System.out.println("Department: " + dep + "  Count: " + count));
+		
+		//part 7 
+		// this will find all Maintenance employees 
+		Map<String, Long> maintenceCount = list.stream()
+				.filter(e -> e.getDep().equals("Maintenance"))
+				.collect(Collectors.groupingBy(g -> g.getGender(), TreeMap::new, Collectors.counting()));
+		maintenceCount.forEach((gender,count) -> System.out.println("Males and Females in Maintenance Department: " +gender+" : "+count));
+		
+		//part 8 
+		// this will get the average of all employees salaries 
+		Map<String, Double> averageSalary = list.stream().collect(
+				Collectors.groupingBy(Employee::getGender, TreeMap::new, Collectors.averagingDouble(Employee::getSalary)));
+		averageSalary.forEach((gender, avgSal) -> System.out.println("This is the average salary based on genders: " + gender + " : " + avgSal));
+		
+		//part 9
+		// this will get employees under 30 and employees over 25
+		List<Employee> under30 = list.stream().filter(e -> e.getAge() <= 30).collect(Collectors.toList());
+		List<Employee> over25 = list.stream().filter(e -> e.getAge() >=25).collect(Collectors.toList());
+		System.out.println("Employees under 30: " + under30);
+		System.out.println("Employees over 25: " + over25);
+		
+		//part 10 
+		// this will get the names of employees in each department
+		Map<String, List<Employee>> namesofDep = list.stream().collect(Collectors.groupingBy(Employee::getDep));
+		namesofDep.forEach((dep, names) -> System.out
+				.println("" + dep + " : " + names.stream().map(Employee::getName).collect(Collectors.toList())));
+	
 	}
 
 }
