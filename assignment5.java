@@ -88,7 +88,11 @@ public class assignment5 {
 		
 		//part 3 
 		//this will find the highest salary member 
+		Employee highestSalary = list.stream().max(Comparator.comparing(e->e.getSalary())).get(); 
+		System.out.println(highestSalary);
 		
+		//part 4 
+		// this will list all the employees who joined after 2015
 		
 		
 
